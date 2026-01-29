@@ -1,65 +1,128 @@
-import Image from "next/image";
+'use client';
 
-export default function Home() {
+import { useState, useEffect } from 'react';
+import { 
+  Container,
+  Paper, 
+  Stepper, 
+  Step, 
+  StepLabel, 
+  Button, 
+  Typography, 
+  Box
+} from '@mui/material';
+// Domain Components
+import { StepIdentity } from './components/StepIdentity';
+import { StepLocation } from './components/StepLocation';
+import { StepTeam } from './components/StepTeam';
+import { StepReview } from './components/StepReview';
+import { SubmissionOverlay } from './components/Overlay';
+// Definitions
+import { EventFormData } from './types';
+import { STEPS, INITIAL_STATE } from './constants';
+
+// WizardPage Orchestrator - This component manages the shared state and navigation logic.
+ 
+export default function WizardPage() {
+  // Navigation state
+  const [activeStep, setActiveStep] = useState(0);
+  // Shared Form state
+  const [formData, setFormData] = useState<EventFormData>(INITIAL_STATE);
+  // Submission state
+  const [isFinished, setIsFinished] = useState(false);
+
+  const isLastStep = activeStep === STEPS.length - 1;
+
+  // Navigation logic handlers
+  const handleNext = () => {
+    if (isLastStep) {
+      console.log("Final Data to Send:", formData);
+      
+      // 1. Enable the overlay and disable buttons
+      setIsFinished(true);
+
+      // 2. We use a small timeout to allow React to render the overlay 
+      // before the blocking alert window appears.
+      window.setTimeout(() => {
+        alert("Event Created Successfully!");
+        
+        // 3. Reset everything after the user clicks "OK"
+        setActiveStep(0);
+        setIsFinished(false);
+        setFormData(INITIAL_STATE);
+      }, 100); // 100ms is enough for a smooth render
+      
+      return;
+    }
+    
+    if (activeStep < STEPS.length - 1) {
+      setActiveStep((prev) => prev + 1);
+    }
+  };
+
+  const handleBack = () => {
+    if (activeStep > 0) {
+      setActiveStep((prev) => prev - 1);
+    }
+  };
+
+  const renderStepContent = (step: number) => {
+    switch (step) {
+      case 0: return <StepIdentity formData={formData} setFormData={setFormData} />;
+      case 1: return <StepLocation formData={formData} setFormData={setFormData} />;
+      case 2: return <StepTeam formData={formData} setFormData={setFormData} />;
+      case 3: return <StepReview formData={formData} setFormData={setFormData} />;
+      default: return <div>Unknown Step</div>;
+    }
+  };
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <Container maxWidth="md" sx={{ py: 8 }}>
+      {isFinished && <SubmissionOverlay />}
+      <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+        <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: 'bold' }}>
+          Event Manager
+        </Typography>
+
+        <Stepper activeStep={activeStep} sx={{ mb: 4, mt: 4 }}>
+          {STEPS.map((label) => (
+            <Step key={label}>
+              <StepLabel>{label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+
+        <Box sx={{ minHeight: '300px', py: 2 }}>
+          <Typography color="textSecondary" sx={{ mb: 1}}>
+            Current Step: {activeStep + 1} of {STEPS.length}
+          </Typography>
+          {renderStepContent(activeStep)}
+        </Box>
+
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
+          <Button disabled={activeStep === 0}
+          onClick={handleBack}
+          variant="outlined"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Back
+          </Button>
+          <Button 
+            variant="contained" 
+            onClick={handleNext}
+            disabled={isFinished}
+            sx={{
+              // color fix for disabled state
+              "&.Mui-disabled": {
+                backgroundColor: "rgba(0, 0, 0, 0.12)",
+                color: "rgba(0, 0, 0, 0.38)",
+              }
+            }}
           >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+            {isLastStep ? 'Finish' : 'Next'}
+          </Button>
+        </Box>
+      </Paper>
+    </Container>
   );
 }
+
