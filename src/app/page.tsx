@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { 
   Container,
   Paper, 
@@ -24,10 +24,11 @@ import { STEPS, INITIAL_STATE } from './constants';
 // WizardPage Orchestrator - This component manages the shared state and navigation logic.
  
 export default function WizardPage() {
-  // Navigation state
-  const [activeStep, setActiveStep] = useState(0);
   // Shared Form state
   const [formData, setFormData] = useState<EventFormData>(INITIAL_STATE);
+
+  // Navigation state
+  const [activeStep, setActiveStep] = useState(0);
   // Submission state
   const [isFinished, setIsFinished] = useState(false);
 
@@ -41,8 +42,7 @@ export default function WizardPage() {
       // 1. Enable the overlay and disable buttons
       setIsFinished(true);
 
-      // 2. We use a small timeout to allow React to render the overlay 
-      // before the blocking alert window appears.
+      // 2. Timeout to allow React to render the overlay 
       window.setTimeout(() => {
         alert("Event Created Successfully!");
         
@@ -50,7 +50,7 @@ export default function WizardPage() {
         setActiveStep(0);
         setIsFinished(false);
         setFormData(INITIAL_STATE);
-      }, 100); // 100ms is enough for a smooth render
+      }, 100);
       
       return;
     }

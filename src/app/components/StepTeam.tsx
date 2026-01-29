@@ -91,7 +91,6 @@ export const StepTeam = ({ formData, setFormData }: StepProps) => {
 
       <Divider />
 
-      {/* Nivel de Acceso General */}
       <TextField
         select
         label="General Access Level"
