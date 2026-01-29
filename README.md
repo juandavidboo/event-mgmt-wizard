@@ -29,7 +29,7 @@ The focus was on creating a scalable architecture, maintaining a single source o
    ```bash
    npm install
 3. Run the development server:
-  ```bash
+   ```bash
    npm run dev
 4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
