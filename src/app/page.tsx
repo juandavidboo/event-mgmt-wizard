@@ -81,7 +81,7 @@ export default function WizardPage() {
       {isFinished && <SubmissionOverlay />}
       <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
         <Typography variant="h4" align="center" gutterBottom sx={{ fontWeight: 'bold' }}>
-          Event Manager
+          Event Manager - Create new event
         </Typography>
 
         <Stepper activeStep={activeStep} sx={{ mb: 4, mt: 4 }}>
